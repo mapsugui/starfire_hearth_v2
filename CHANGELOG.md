@@ -3,7 +3,195 @@
 Newest first. A claim marked **Verified** names the command that proved it, run from the
 repository root after `godot --headless --path . --import`. Everything else is **Unverified**.
 
-## Unreleased (after M0)
+## Unreleased: M1, First Light (in progress)
+
+### Outsourced assets: the intake tool and the first delivery (DESIGN_LOG 93)
+
+- `tools/import_assets.py` (§15.2): checks each batch zip against the manifest, the licence
+  rules and the briefs (format, size, length, loudness and true peak, transparency, SVG rules),
+  converts (music to Ogg Vorbis quality 6, sounds to 16-bit WAV, painted art to lossy WebP at
+  display size), writes the Godot import settings, marks ids delivered and credits each batch.
+- Ingested 131 ids in 9 batches: sounds 1–2 (40), music 1 (28), VFX 1 (17), story scenes 1 (7),
+  portraits 1 (6 neutral), ships 1 (17), title key art and logos (5), store art (11, kept out of
+  the game's pack). Two warnings, no failures: `beacon_activate` had 7.6 ms of leading silence
+  (trimmed); `logo_dark_on_light` uses two darker shades outside the palette.
+- In the game: real sounds and music play; the title shows the key art with the menu in its calm
+  left side and the vector logo; portraits are painted and cut to their disc; story scenes are
+  painted and cropped, not stretched; the showcase uses the real scenes; the project icon is the
+  delivered emblem.
+- **Verified:** `godot --headless --path . -s tests/run_tests.gd`: 160 passed, 0 failed, 3,006
+  checks (new `tests/unit/test_assets.gd`); `tools/validate_data.gd`: 0 errors; the screenshot
+  tour: 108 shots, 0 audit issues (before the showcase switched to the real scenes; its two
+  states re-shot with 0 issues); web export: 48.2 MB as a gzip download (budget 150 MB), with no
+  store art in the pack. **Unverified:** the web smoke test on this build (stopped at the
+  Owner's request to save usage).
+
+### Simulation: the Scenario 1 rules (DESIGN_LOG 51–84)
+
+- State schema 2 (research branches, build queues, governors, ordinances, surveys, modifiers,
+  events, the event log, objectives, famine and autonomy counters) with migration `v1_to_v2`.
+  **Verified:** `godot --headless --path . -s tests/run_tests.gd`: the M0 fixture save still loads
+  and passes the invariants, and a new schema 2 fixture (`tests/fixtures/saves/s1_v2.json`, 16
+  scripted turns of Scenario 1) does too.
+- Rules in `sim/rules/`, each with breakdowns: economy (jobs by priority, district and colony
+  bonuses, flat upkeep and consumption, industry input and mineral shortages, caps and overflow,
+  influence), population (growth, homelessness, famine), stability (every §5.4 source, bands,
+  unrest and autonomy), research (costs, seeded hands, carry-over, rerolls, story and objective
+  techs), construction (queues, tiers, adjacency, building limits, demolition, rushing),
+  governors (advisor plans with reasons, purses, vetoes), ordinances, civilian ships (surveys,
+  outposts, colonisation), the market, objectives and the tutorial. **Verified:** the test run
+  above: 135 passed, 0 failed, 1,196 checks, including Aster's starting numbers against §5
+  (food +13.00, energy +10.00, minerals +11.00, research 1.80 per branch, influence +4.00,
+  housing 20, stability 67).
+- Event engine: triggers from a closed set of conditions with Why? reasons, scripted and status
+  chains, a paced director (at most one emergent event every 4–6 turns), choices with costs,
+  lasting modifiers, "Uncertain" outcomes on the EVENTS stream, delayed chain steps, and the
+  log. **Verified:** `--filter events` (7 tests).
+- 21 new commands, each validated with a reason (districts, upgrades, demolition, buildings,
+  ships, queue edits, rushing, research picks and rerolls, ordinances, governors, vetoes,
+  surveys, outposts, colonising, event choices, tutorial steps, trades). **Verified:**
+  `--filter commands` (every type round-trips through the registry).
+- **Golden re-baseline.** Reason: "M1: the economy, events and orders run in every phase; schema
+  2". New golden: 24 scripted turns of Scenario 1 (`tests/golden/s1_hashes.json`). **Verified:**
+  `--filter golden` (4 tests, including a save and load at every turn).
+
+### Balance pass (DESIGN_LOG 92)
+
+- Cheaper tier 1 and 2 technologies, a leaner Scenario 1 start (food, influence), dearer Colony
+  Ships in food, a Market Exchange paid partly in metals, metal costs on the advanced buildings,
+  and advisor and bot changes (full stocks, workerless output, saving up for a clear best
+  option). Tests that pinned the old numbers now read them from the rules; the golden hashes are
+  re-baselined with this reason. **Verified:** `tools/balance_loop.sh <dir> 1-20` (the CI balance
+  job's runs): invariants 0 problems in 100 runs; pacing median turn 74 (was 78); everything
+  matters fails only on the Foundry (0%) and the Research Institute (3%), where it failed on
+  four buildings; hoarding still 80 of 80 runs (food 84, metals 80, influence 51, energy 33,
+  was 115, 81, 51, 41); balanced on Normal still wins 20 of 20. The remaining failures are
+  design questions for the Owner. `godot --headless --path . -s tests/run_tests.gd`: 157 passed,
+  0 failed.
+
+### The title is the main scene; lit-sphere planets; the tour and web smoke cover the app (DESIGN_LOG 91)
+
+- The game now starts on the title (`ui/screens/app_root.tscn`); the UI showcase is a debug-build
+  entry on it.
+- Planets are lit spheres drawn by `ui/map/planet_sphere.gdshader`: a painted-looking surface
+  from 3D noise on the sphere (seas, land, ice caps and clouds; dunes; ice cracks; craters;
+  swirling haze; gas-giant bands with a storm), a soft terminator, a rim light and an atmosphere
+  glow, all from the type's palette and the seed. Ringed gas giants draw their rings in two halves
+  around the sphere; asteroid belts are unchanged.
+- The screenshot tour also visits the app: title, campaign, briefing, the game route, the debrief
+  of a real win (the balanced bot plays Scenario 1 to victory first), with a legacy chosen and
+  lost, the Codex, an entry and the Codex over a screen. **Verified:** `xvfb-run -a -s "-screen
+  0 2560x1600x24" godot --rendering-driver opengl3 --path . -s tools/screenshot_tour.gd -- --out
+  screens/`: 108 screenshots, 0 audit issues.
+- The web smoke test also opens the game with `?smoke=begin`, which starts Scenario 1 and plays
+  one turn (auto-saving it), and checks that the browser reaches the same state hash as the
+  desktop (`tools/smoke_hash.gd`). **Verified:** `node tools/web_smoke.mjs --build build/web
+  --expect-hash 8d3b3f7d3ce6` after a web export: PC, phone and iPad each reached turn 2 with
+  state `8d3b3f7d3ce6` and 1 save; a wrong expected hash fails all three.
+
+### Codex, Scenario 1 subset (DESIGN_LOG 90)
+
+- The Codex from the title (search; categories, list and entry side by side on PC, falling back
+  to two columns with large text; list then entry on phones) and over any screen: every "Codex"
+  link in a breakdown now opens its entry, with Back through the links followed. 22 mechanics
+  pages in `data/codex/*.md` quote their numbers from the rules and data (`CodexFacts`), so they
+  cannot disagree with the game; resources, districts, the buildings and technologies Scenario 1
+  can offer, its ordinances and civilian ships, Ember's worlds and traits, and its cast are built
+  from the data, with costs as explainable chips, effects and "See also" links; with a game
+  running, every event step seen so far. **Verified:** `--filter codex` (5 tests: coverage of
+  Scenario 1's scope, every link resolves, all 20 mechanic links that breakdowns make have an
+  entry, live numbers, search and seen events) and the id audit on the Codex, an entry, a
+  mechanics page, a search and the overlay as a PC and a phone at 100% and 200% text.
+
+### Saves and campaign progress (DESIGN_LOG 89)
+
+- `SaveService`: an auto-save after every resolved turn in a ring of 10, a checkpoint every fifth
+  turn in a ring of 6, numbered manual saves, deletion, a listing read from the save envelopes
+  (kind, scenario, turn, seed, thumbnail), and a 320-pixel-wide PNG thumbnail beside each save
+  when a renderer is running. A lost debrief offers the newest checkpoint of that game from before
+  the loss. Campaign progress (difficulty, wins, legacies) is kept in `user://campaign.json` and
+  written after every change. Continue on the title picks up the newest auto-save.
+  **Verified:** `--filter save_service` (4 tests: both rings over 40 turns, the checkpoint a loss
+  goes back to, manual saves, deletion, auto-saving only while persistence is on, the campaign
+  file across a restart).
+
+### Audio (DESIGN_LOG 88)
+
+- `Audio` autoload: UI, Effects and Music buses under Master; UI, effects and music volumes and
+  mute in `Settings` (saved); every §15.4 sound by id, from its delivered file or, until then, a
+  blip synthesised from a recipe in `app/sound_synth.gd` (soft, D major pentatonic, the same
+  samples every time); music cues per screen (the main theme on the title and campaign, the
+  scenario's briefing and main tracks, a sting at the debrief) that crossfade and stay silent
+  until the tracks are delivered. Buttons, overlays, pinned breakdowns, warning toasts and End
+  Turn make their sounds. `tools/audio_preview.gd` writes every fallback to WAV with a length and
+  peak report; CI uploads them as the `audio-preview` artifact. **Verified:** `--filter audio`
+  (5 tests: buses follow the settings, all 40 ids have a fallback or are a bed, lengths 0.05 to
+  2.22 s, peaks at most 0.85, deterministic renders, silent music cues, UI sounds) and
+  `godot --headless --path . -s tools/audio_preview.gd` (39 sounds written).
+
+### Screens: the app shell and the campaign flow (DESIGN_LOG 85–87)
+
+- `AppRoot` (`ui/screens/app_root.tscn`) hosts one screen at a time and routes title → campaign →
+  briefing → game → debrief, plus the showcase in debug builds. Only screens that exist are
+  offered; until the game screen lands, a stand-in names the game that Begin started. Not yet the
+  main scene: the showcase stays the main scene until the M1 screen work is complete.
+- Title (the sky with lane pulses, or the painted key art once delivered; Continue opens the newest
+  save that loads), campaign select (the difficulty preset, three scenario cards: ready, won with
+  its legacy, locked until the one before is won, or not in this build), briefing (Archivist
+  Sola, the briefing, required and optional objectives, the difficulty, Begin) and debrief (the
+  outcome and why, the objectives as they ended, the legacy pick after a win; Try again after a
+  loss). Phones scroll the scenario cards sideways and put each screen's buttons in its heading
+  row. `CampaignProgress` holds the difficulty, wins and legacy picks for the session.
+  **Verified:** `godot --headless --path . -s tests/run_tests.gd -- --filter flow_screens` (2
+  tests: the whole flow driven through the AppRoot, and the id audit on 8 screen states as a PC
+  and a phone at 100% and 200% text, 0 issues) and `--filter campaign_progress` (3 tests).
+- Fixed: a tab button marked pressed before it entered the tree lost the mark, so the showcase's
+  page and text-size tabs never showed which was selected. Fixed: a portrait's shoulders were
+  drawn outside its disc, over the text beside it. **Verified:** the full suite (143 passed, 0
+  failed, 1,498 checks) and `xvfb-run -a -s "-screen 0 2560x1600x24" godot --rendering-driver
+  opengl3 --path . -s tools/screenshot_tour.gd -- --out screens/` (68 screenshots, 0 audit
+  issues).
+
+### Display building blocks for the M1 screens
+
+- Effects as readable text (`sim/explain/effect_text.gd`), with signed number arguments in the
+  string layer. New components: `EffectList`, `CostChips`, and code placeholders for story scenes
+  (`StoryScene`) and speaking characters (`Portrait`), drawn from `data/vignettes.json` and
+  `data/portraits.json`. `AssetIds` resolves a §15 id to a delivered file, or to nothing while
+  outsourcing is on hold. **Verified:** `--filter effect_text` (3 tests, 221 checks: every effect
+  in every event choice reads without a raw placeholder).
+- `docs/BUILD_PROMPT.md` rewrite 4: M1 progress, the balance status, the screen plan and where to
+  resume. Documentation only.
+
+### Content
+
+- Scenario 1 is playable: the full start state (Ark Hull, Spaceport, both ships, seeded research
+  hands), 4 required and 3 optional objectives, 14 tutorial steps, loss rules, locked
+  ordinances, the tech pool and the balance scope. Cinder is now a small dome world (DESIGN_LOG
+  66).
+- 16 event chains with 36 fully written steps: The Founders' Vote, Cold Sleepers, Labor Strike,
+  The Sealed Order (steps 1–2), The Ark's Last Engine; the status chains Unrest, Empty Granaries
+  and Envoys of the Autonomy; and 8 emergent chains (Solar Flare, Crop Blight, Mine Collapse,
+  Founding Day, The Frontier Doctor, Refugee Slowboat, Ice Comet Capture, Orbital Debris
+  Cascade). Every body is 60–140 words. **Verified:** `godot --headless --path . -s
+  tools/validate_data.gd`: 0 errors, 0 skipped checks, including the new reachability walk and
+  event word counts.
+
+### Bots and balance telemetry
+
+- Bot policies balanced, economy, turtle and random-legal play the whole scenario through the
+  same commands as a player; per-turn telemetry now records income, gross income, caps,
+  overflow, builds, techs, events, objectives and the outcome. `tools/telemetry_report.gd`
+  computes all five balance gates. **Verified** on 6 seeds per policy (105 turns, Normal):
+  balanced wins 6 of 6 (median win turn 79; expected 70); random-legal wins 0 of 6; no dead
+  turns; end-turn p95 34 ms. On CI, 20 seeds per policy plus Story (run 36006538014): balanced
+  20/20 on Normal and 20/20 on Story, median win turn 78; random-legal 0/20; end-turn p95 36 ms.
+  **Failing, still being tuned:** no hoarding (80 of 80 runs: food early, metals after the
+  colony ships, influence, energy), everything matters (Foundry 0%, Research Institute 1%,
+  Fusion Plant 3%, Hydroponics Bay 11%), and the balanced win rate on Normal is above the 60–90%
+  band.
+
+## After M0
 
 - Display renames and units (Owner request, DESIGN_LOG 42): Metals (was Alloys), Ordinance (was
   Edict), settlers (1 pop = 1,000), and units kt, GW, Mt, kt on food, energy, minerals and metals
