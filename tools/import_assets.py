@@ -13,7 +13,7 @@ item. A FAIL item is not ingested and keeps its fallback. --check writes nothing
 asset is never replaced without --replace. Reports and contact sheets go to reports/assets/
 (git-ignored).
 
-Conversions: music to Ogg Vorbis (quality 6); sounds to 16-bit WAV (a looping bed to Ogg);
+Conversions: music to Ogg Vorbis (quality 5); sounds to 16-bit WAV (a looping bed to Ogg);
 optional character voice to non-looping Ogg Vorbis; scenes, portraits and key art to lossy WebP
 at display size; ships and VFX stay PNG; store art is kept as delivered in a folder Godot ignores,
 so it never ships inside the game.
@@ -122,17 +122,20 @@ WEBP_QUALITY = 88
 # Godot re-encodes every texture on import; painted art is stored lossy in the game's pack
 # (lossless would be several times larger) and gets mipmaps, as it is drawn at many sizes.
 PAINTED_IMPORT = {"compress/mode": 1, "compress/lossy_quality": 0.85, "mipmaps/generate": True}
-# Vorbis quality 6. The budget (§9.11) allows about 112 kbps on average; this sparse, clean music
-# needs far less at any quality, so it gets a high one (batch 1 averages about 70 kbps).
-OGG_QUALITY_MUSIC = 0.6
+# Vorbis quality 5. The budget (§9.11) allows about 112 kbps on average at batch 1's 83 minutes.
+# Batch 1 was sparse (about 70 kbps at quality 6); revision 3 (batch 2) is fuller and needs about
+# 180 kbps at quality 6, which overran the budget, and 153 kbps at quality 5 (60 MB in all).
+OGG_QUALITY_MUSIC = 0.5
 OGG_QUALITY_BED = 0.4
 
 # §9.11: what the game may add to the web download.
 BUDGET_MB = {"music": 70.0, "sfx": 5.0, "painted": 40.0}
 
 LICENCE_OK = re.compile(r"cc0|public domain|work[- ]for[- ]hire|all rights (assigned )?to the owner|"
-                        r"commercial use (is )?(permitted|allowed)", re.I)
-LICENCE_BANNED = re.compile(r"non-?commercial|\bnc\b|share-?alike|\bby-sa\b|\bby-nc\b|\bcc[- ]by\b", re.I)
+                        r"commercial use (is )?(permitted|allowed)|\bcc[- ]by\b", re.I)
+LICENCE_BANNED = re.compile(r"non-?commercial|\bnc\b|share-?alike|\bby[- ]sa\b|\bby[- ]nc\b|\bby[- ]nd\b", re.I)
+# CC BY (attribution only) is accepted when the batch states the credit to record (DESIGN_LOG 105).
+LICENCE_ATTRIBUTION = re.compile(r"\bcc[- ]by\b", re.I)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -758,8 +761,10 @@ def record_credits(kind, batch, meta, ids, today):
             "`tools/import_assets.py`.\nEach item replaces its code fallback; the files are under " \
             "`assets/delivered/`.\n" % head
     tag = "- **%s batch %s**" % (kind, batch)
-    entry = textwrap.fill("%s (%d ids, ingested %s). Licence: %s Source: %s" % (
-        tag, len(ids), today, _sentence(meta.get("licence", "")), _sentence(meta.get("source", ""))),
+    attribution = str(meta.get("attribution", "")).strip()
+    entry = textwrap.fill("%s (%d ids, ingested %s). Licence: %s Source: %s%s" % (
+        tag, len(ids), today, _sentence(meta.get("licence", "")), _sentence(meta.get("source", "")),
+        " Attribution: " + _sentence(attribution) if attribution else ""),
         width=100, subsequent_indent="  ", break_long_words=False, break_on_hyphens=False)
     # Drop this batch's old entry: its first line and the indented lines that continue it.
     lines, skipping = [], False
@@ -805,6 +810,8 @@ def check_licence(meta):
         fails.append("licence not accepted (§15.1 rule 3): %s" % lic)
     if not src.strip():
         fails.append("the manifest names no source")
+    if LICENCE_ATTRIBUTION.search(lic) and not str(meta.get("attribution", "")).strip():
+        fails.append("a CC BY licence needs the credit to record: add \"attribution\" to the manifest")
     generated = re.search(r"image_gen|generated (using|with|by)|midjourney|stable diffusion|dall-?e", lic + " " + src, re.I)
     if generated and not re.search(r"\bplus\b|\bpro\b|\bteam\b|\benterprise\b|\bplan\b", lic + " " + src, re.I):
         warns.append("generated art, but the plan whose terms allow commercial use is not named (§15.1 rule 3)")

@@ -300,8 +300,7 @@ overruled by the Owner; overruled entries are struck through, not deleted.
     painted art is imported lossy with mipmaps (lossless is about five times larger) and drawn
     with mipmap filtering, since it appears at many sizes; ships and VFX stay lossless PNG.
     Short sounds stay 16-bit PCM so they start at once; the looping ambient bed and the music
-    are Ogg Vorbis, the music at quality 6 (this sparse music averages about 70 kbps, well
-    inside the 112 kbps the budget allows). Store art is kept in a `.gdignore` folder, so it is
+    are Ogg Vorbis, the music at quality 5 (quality 6 until entry 107; see there). Store art is kept in a `.gdignore` folder, so it is
     in the repository for the store pages but never enters the game's pack. A fault the builder
     can fix without changing the work is fixed and reported as a warning (near-silence before a
     sound is trimmed; a #00FF00 background is keyed out); any other broken rule fails the item,
@@ -440,3 +439,27 @@ overruled by the Owner; overruled entries are struck through, not deleted.
      follows arcs, attached markers follow through ambient pause, and asteroid belts
      share the orbital transition/focused-camera path. Final evidence and platform
      limits are in `milestones/M1_2_D_G_REVALIDATION_REPORT.md`.
+
+105. **Accept CC BY assets when the credit is recorded** (Owner decision, audio revision 3): the
+     approved revision 3 soundtrack uses the Salamander Grand Piano V3 by Alexander Holm, which
+     is CC BY 3.0. The Owner chose to keep it rather than swap to a CC0 upright piano. §15.1
+     rule 3 and `tools/import_assets.py` now accept CC BY when the batch manifest gives the
+     credit as `"attribution"`, which the intake writes into `CREDITS.md`. Share-alike,
+     non-commercial and no-derivatives licences stay rejected.
+
+106. **Horror and grimdark are no longer banned** (Owner decision, branching campaign): the darker
+     routes and endings (Only Ember, Fossil Light, and the failure endings) need them. §4.1 and
+     §8 drop the ban; §15.3 adds a dark variant that keeps the diorama forms and light direction
+     with a muted palette and one small warm light; §15.10 keeps "grimdark, horror" in the negative
+     prompt only for standard, hopeful scenes. "No grime or gore" (§15.3, Surfaces) still applies.
+     All 27 ending scenes are made at full size (3200×1200).
+
+107. **Revision 3 soundtrack installed; music encodes at Vorbis quality 5** (Owner approval, "Much
+     better. Incorporate that."): all 28 music ids are now music batch 2, rendered by
+     `tools/art/audio_rework/compose.py` and packaged by `package_batch.py` through the normal
+     intake. At quality 6 the fuller revision 3 averaged about 180 kbps (70.1 MB, over the 70 MB
+     budget of §9.11). At quality 5 it averages 153 kbps (59.9 MB). Every cue opens with 0.3 s
+     of silence, so a looping cue's `.import` sets `loop_offset=0.3` and repeats play from the
+     first note. Not yet solved: the draft Chapter 2+ asset plan's 6 themes (about 14 MB) and 22
+     ending stings (about 8 MB) would bring music to about 82 MB. That batch needs quality 4
+     for all music (about 127 kbps; about 68 MB in all) or a larger budget.

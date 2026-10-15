@@ -395,8 +395,9 @@ vast and slow. Physics is respected:
 - there are no energy beings
 - aliens are strange but biologically plausible
 
-The writing is humane and specific, sometimes funny, and never grimdark for its own sake. Every
-event should give the player someone to care about.
+The writing is humane and specific, sometimes funny. Horror and grimdark are allowed where the
+story leads there (the darker routes of the branching campaign, DESIGN_LOG 106). Every event
+should give the player someone to care about.
 
 ### 4.2 Timeline (canon)
 
@@ -1131,7 +1132,8 @@ listing every resource with its unit, the Noise meter and the date.
     stylized, chunky 3D forms like a hand-built miniature, rendered with soft painterly brushwork,
     glowing light and luminous skies, in the spirit of hopeful 1960s space-age illustration. The
     full direction is in §15.3.
-- It is not pixel art, not photoreal, and not grimdark.
+- It is not pixel art and not photoreal. Its default mood is hopeful; darker routes use the dark
+  variant of §15.3.
 - **Baseline:** every world asset keeps a code-drawn fallback, so the game is always complete.
   Outsourced art replaces the fallback through the intake contract of §15.
 - **Mood references for human artists:** the games *Before We Leave*, *Dorfromantik* and *Outer
@@ -2334,7 +2336,7 @@ batch.
    holds the files at its root, plus a `manifest.json`:
    ```json
    { "kind": "sfx", "batch": 1,
-     "licence": "CC0 | work-for-hire, all rights to the Owner | generated, commercial use allowed (tool + plan named)",
+     "licence": "CC0 | work-for-hire, all rights to the Owner | generated, commercial use allowed (tool + plan named) | CC BY (with \"attribution\")",
      "source": "who or what made it (person, studio, or tool and version)",
      "items": [ { "id": "ui_click", "file": "ui_click.wav", "notes": "optional" } ] }
    ```
@@ -2353,10 +2355,11 @@ batch.
    | `art` | §15.9 | 1 = title key art and logo (A8) |
    | `store` | §15.9 | 1 = store and platform art (A10) |
 3. **Licence:**
-   - Allowed: CC0; work-for-hire with all rights assigned to the Owner; or generated with
-     commercial-use rights that the tool's terms grant for this plan.
-   - Rejected: anything requiring attribution-only-in-credits-with-conditions, non-commercial
-     terms, or share-alike.
+   - Allowed: CC0; work-for-hire with all rights assigned to the Owner; generated with
+     commercial-use rights that the tool's terms grant for this plan; or CC BY (attribution
+     only) when the batch manifest gives the credit as `"attribution"` (DESIGN_LOG 105).
+   - Rejected: non-commercial terms, share-alike, no-derivatives, or any attribution
+     requirement beyond a credit line.
    - Every accepted batch is credited in `CREDITS.md`.
 4. **No text in images, and no logos or trademarks** other than the game's own. Do not imitate
    named artists or franchises.
@@ -2440,8 +2443,13 @@ Its rules:
   of an optimistic 1960s science-fiction novel built as a miniature.
 - **Consistency:** the same light direction, brush treatment and level of detail in every image.
 - **Avoid:** photorealism, photographic textures, film grain, noise, lens flares, chrome, busy
-  mechanical clutter, grimdark or horror, anime or cartoon exaggeration, text, letters, logos,
-  watermarks, and imitation of any named artist, studio or franchise.
+  mechanical clutter, anime or cartoon exaggeration, text, letters, logos, watermarks, and
+  imitation of any named artist, studio or franchise.
+- **Dark variant** (DESIGN_LOG 106): horror and grimdark are allowed for scenes that call for them,
+  such as the darker routes and endings of the branching campaign. Keep the same diorama forms,
+  light direction and brushwork, and shift to a muted palette of deep blues and cold greys, dread,
+  emptiness and long shadows, with one small warm light as the accent. The "no grime or gore" rule
+  under Surfaces still applies.
 
 **Colour:** built around the key colours of §8.2, with any lighter and darker shades of them for
 light and shade, plus the skin and hair tones of §15.1 for people. Most of each image sits in the
@@ -2547,7 +2555,7 @@ tracks (P) are needed first, for Scenario 1.
 | `mus_beacon_2` | 2–3 min | mid game variation: trade and neighbours; a little more motion; light percussion allowed |
 | `mus_jump_1` | 2–3 min | late game: power with unease; the main motif in a minor key; low strings and piano |
 | `mus_jump_2` | 2–3 min | late game variation: grand but lonely |
-| `mus_attention` | 2–3 min | when the colony grows too loud and something vast notices: sparse, eerie, a slow low pulse, glassy high notes; never horror |
+| `mus_attention` | 2–3 min | when the colony grows too loud and something vast notices: sparse, eerie, a slow low pulse, glassy high notes |
 | `mus_battle` | 1.5–2 min | battle replays: urgent but restrained; string ostinato; timpani allowed |
 | `theme_sola` (P) | 1.5–2.5 min | Archivist Imre Sola: dry, warm, scholarly, a little playful; clarinet or bassoon, pizzicato strings, piano |
 | `theme_varga` (P) | 1.5–2.5 min | Steward Anneliese Varga: steady and earnest, carrying worry; warm cello and piano |
@@ -2774,7 +2782,8 @@ Also deliver the layered sources where they exist.
   brushwork, warm key light from the upper left, cool blue shadows, glowing windows, luminous
   painted sky, atmospheric haze, hopeful 1960s space-age illustration, calm science fiction".
   For negative prompts: "text, letters, logo, watermark, photorealistic, photograph, film grain,
-  noise, lens flare, chrome, grimdark, horror, anime, cartoon".
+  noise, lens flare, chrome, anime, cartoon". For standard, hopeful scenes, add "grimdark, horror"
+  to keep the tone; leave them out for the dark variant.
 - **Consistency:** keep one fixed style line and the same settings for a whole batch. For
   portraits, generate the neutral portrait first and use it as the character reference for the
   expressions.
