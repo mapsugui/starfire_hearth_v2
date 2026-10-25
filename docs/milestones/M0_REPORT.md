@@ -10,7 +10,7 @@ repository root after `godot --headless --path . --import`.
 ## How to look at it
 
 - **Web build (PC and phone):** once Pages is on and this branch is merged, CI deploys it to
-  `https://mapsugui.github.io/starfire_hearth_v2/` (**Unverified** until then).
+  `https://mariyaholic.github.io/starfire_hearth_v2/` (**Unverified** until then).
 - **Before that:** every CI run on the pull request uploads a `web-build` artifact. Unzip it and
   serve the folder, for example with `python3 -m http.server`, then open `http://localhost:8000`.
   A browser cannot run it straight from disk.
@@ -71,7 +71,7 @@ Also built:
 | Exports | `godot --headless --path . --export-release "Web" build/web/index.html` (also `"Windows"`, `"Linux"`) | **Verified:** all three exit 0 |
 | Linux build runs | `xvfb-run -a ./build/linux/StarfireHearth.x86_64 --rendering-driver opengl3 --quit-after 240` | **Verified:** exit 0, no script errors. The Windows build has not been run: **Unverified** |
 | Web build runs | `node tools/web_smoke.mjs --build build/web --out screens/web` | **Verified:** 3 of 3 devices pass. PC gets "wide, pointer"; Android phone (873x393 at 2.75x) and iPad get "compact, touch". Each boots in under 2 s with software WebGL |
-| CI green on GitHub | [run 35977347923](https://github.com/mapsugui/starfire_hearth_v2/actions/runs/35977347923) on commit `067987d` | **Verified:** all three jobs passed. On the runner: 85 tests passed; 68 screenshots with 0 audit issues; web smoke test 3 of 3; end-turn p95 2.06 ms |
+| CI green on GitHub | [run 35977347923](https://github.com/mariyaholic/starfire_hearth_v2/actions/runs/35977347923) on commit `067987d` | **Verified:** all three jobs passed. On the runner: 85 tests passed; 68 screenshots with 0 audit issues; web smoke test 3 of 3; end-turn p95 2.06 ms |
 | Web build deployed | Pages deploy job, on `main` | **Not done:** Pages is off (question 1) |
 | Look approved | Owner playtest on PC and phone | Waiting for you |
 

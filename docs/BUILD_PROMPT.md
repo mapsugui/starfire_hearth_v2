@@ -1,7 +1,7 @@
 # STARFIRE HEARTH: Complete Build Prompt (rewrite 4, M1 in progress)
 
 **To the builder** (the AI coding agent reading this): this document is your whole brief. You are
-building a complete game in the GitHub repository `mapsugui/starfire_hearth_v2`, working alone
+building a complete game in the GitHub repository `mariyaholic/starfire_hearth_v2`, working alone
 under the direction of the project Owner. It replaces the original build prompt. It keeps every
 game-design rule of the original, records what milestone M0 has already built, and adds the
 Owner's decisions from the M0 review:
@@ -42,8 +42,8 @@ For example, **Metals** (`alloys`) and **Ordinances** (`edict`).
 
 | Item | State |
 | --- | --- |
-| Repository | `mapsugui/starfire_hearth_v2`, **public**. Licence: "All rights reserved" (§14) |
-| M0: Foundation and UI kit | **Built and merged** (PR #1). CI green. The web build is deployed to GitHub Pages at `https://mapsugui.github.io/starfire_hearth_v2/`. The Owner approved the look |
+| Repository | `mariyaholic/starfire_hearth_v2`, **public**. Licence: "All rights reserved" (§14) |
+| M0: Foundation and UI kit | **Built and merged** (PR #1). CI green. The web build is deployed to GitHub Pages at `https://mariyaholic.github.io/starfire_hearth_v2/`. The Owner approved the look |
 | After the M0 review | Display renames and units (§5.0); painted-diorama world art (§8); a visual-novel soundtrack and story scenes (§5.10, §8.6); the web budget raised to 150 MB (§9.11); this prompt rewritten (PR #2) |
 | Outsourced assets | **First delivery ingested** (DESIGN_LOG 93): sounds batches 1–2, music batch 1 (all 28 tracks), VFX, the seven Scenario 1 story scenes, the six neutral portraits, ships, the title key art and logo, and store art. Still on their code fallbacks: story scenes batch 2 (18), the portrait expressions (18), `title_cast` and `logo_title` |
 | M1: First Light | **In progress** on branch `claude/starfire-hearth-build-cs2vb6`, draft PR #3. The plan is `docs/milestones/M1_PLAN.md`. Built and pushed: the simulation, data, story, bots, telemetry, the app shell and campaign flow screens, audio, saves, the Codex, lit-sphere planets, the tour and web smoke over the app, a balance pass, the asset intake with the first delivery, and the game screen with its views, overlays, settings, load and credits. The five balance gates pass after the review of DESIGN_LOG 95 and 96, and the M1 report is written. Next: the Owner plays the checkpoint build |
